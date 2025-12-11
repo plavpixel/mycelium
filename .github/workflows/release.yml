@@ -24,16 +24,17 @@ jobs:
         run: mvn --batch-mode clean package
 
       - name: Upload JAR to Release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.20.0
         with:
-          tag: ${{ github.event.release.tag_name }}
+          uploadUrl: ${{ github.event.release.upload_url }}
           artifacts: 'target/*.jar'
           artifactErrorsFailBuild: true
           body: |
             ${{ github.event.release.body }}
-
-            ## Download
+            
             - **mycelium-${{ github.event.release.tag_name }}.jar**: Ready-to-run JAR file.
             - **Source code**: Available via the tag.
           draft: false
-          prerelease: ${{ contains(github.event.release.tag_name, '-alpha') || contains(github.event.release.tag_name, '-beta') }}
+          prerelease: ${{ github.event.release.prerelease }}
+          update: true
+          replacesArtifacts: true
