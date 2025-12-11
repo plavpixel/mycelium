@@ -26,15 +26,16 @@ jobs:
       - name: Upload JAR to Release
         uses: ncipollo/release-action@v1.20.0
         with:
-          uploadUrl: ${{ github.event.release.upload_url }}
+          tag: ${{ github.event.release.tag_name }}
           artifacts: 'target/*.jar'
           artifactErrorsFailBuild: true
+          allowUpdates: true
+          replacesArtifacts: true
           body: |
             ${{ github.event.release.body }}
             
+            ## Download
             - **mycelium-${{ github.event.release.tag_name }}.jar**: Ready-to-run JAR file.
             - **Source code**: Available via the tag.
-          draft: false
+          draft: ${{ github.event.release.draft }}
           prerelease: ${{ github.event.release.prerelease }}
-          update: true
-          replacesArtifacts: true
