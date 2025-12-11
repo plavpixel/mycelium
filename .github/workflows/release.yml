@@ -24,7 +24,7 @@ jobs:
         run: mvn --batch-mode clean package
 
       - name: Upload JAR to Release
-        uses: ncipollo/release-action@v1[citation:2]
+        uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.event.release.tag_name }}
           artifacts: 'target/*.jar'
