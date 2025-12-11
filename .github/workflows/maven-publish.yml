@@ -1,0 +1,39 @@
+name: Maven Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up GraalVM
+      uses: actions/setup-java@v4
+      with:
+        # Option 1: Use latest GraalVM for Java 21
+        java-version: '21'
+        distribution: 'graalvm'
+        
+        # Option 2: Specific version (check available versions)
+        # java-version: '21.0.2'
+        # distribution: 'graalvm'
+        
+        # Generate settings.xml for GitHub Packages
+        server-id: github
+        server-username: GITHUB_ACTOR
+        server-password: GITHUB_TOKEN
+    
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    
+    - name: Publish to GitHub Packages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: mvn --batch-mode deploy
