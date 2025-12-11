@@ -1,0 +1,39 @@
+name: Build and Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn --batch-mode clean package
+
+      - name: Upload JAR to Release
+        uses: ncipollo/release-action@v1[citation:2]
+        with:
+          tag: ${{ github.event.release.tag_name }}
+          artifacts: 'target/*.jar'
+          artifactErrorsFailBuild: true
+          body: |
+            ${{ github.event.release.body }}
+
+            ## Download
+            - **mycelium-${{ github.event.release.tag_name }}.jar**: Ready-to-run JAR file.
+            - **Source code**: Available via the tag.
+          draft: false
+          prerelease: ${{ contains(github.event.release.tag_name, '-alpha') || contains(github.event.release.tag_name, '-beta') }}
